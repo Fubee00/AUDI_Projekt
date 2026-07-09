@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NFS MW - Mobile Pro V4</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <button id="fs-trigger">FULLSCREEN</button>
+
+    <div class="controls-left">
+        <div id="nos-btn">NOS</div>
+        <div id="gear-up" class="btn-gear">+</div>
+        <div id="gear-down" class="btn-gear">-</div>
+    </div>
+
+    <div class="hud-right">
+        <div class="tacho-box">
+            <img src="tacho_bg.png" class="tacho-bg">
+            <div class="speedo-digital">
+                <span id="gear-val" style="font-size: 28px; color: white; display: block;">1</span>
+                <span id="speed-val" style="font-size: 38px; font-weight: 900; display: block;">000</span>
+                <div style="font-size: 10px; color: #fff; opacity: 0.8;">KM/H</div>
+            </div>
+            <img src="needle.png" id="needle" class="nadel">
+        </div>
+        <div class="turbo-unit">
+            <img src="turb_bg.png" class="turbo-bg-img">
+            <img src="turbo_needle.png" id="turbo-needle" class="turbo-needle">
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
