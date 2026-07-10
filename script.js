@@ -90,6 +90,14 @@ function shiftGear(dir) {
 function update() {
     let rpmZiel = gas * 8000;
     if (isNosActive) rpmZiel = 8500;
+
+    let minSpeed = (currentGear - 1) * 35; 
+    
+    // Wenn du zu langsam für den Gang bist und Gas gibst:
+    if (currentGear > 1 && realSpeed < minSpeed && gas > 0) {
+        // Motor quält sich und ruckelt nur auf niedrigen Touren rum!
+        rpmZiel = 1200 + (Math.random() * 800); 
+    }
     
     rpm += (rpmZiel - rpm) * 0.15;
     
