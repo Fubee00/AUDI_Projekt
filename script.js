@@ -76,12 +76,12 @@ function sendToESP() {
     let effectiveNos = (isNosActive && turboCharge > 0) ? 1 : 0;
     
     if (isStalling) {
-        effectiveGas = 0.1; // Nur 10% Gas an den echten Motor, damit er nicht abhaut!
-        effectiveNos = 0;
+        effectiveGas = 0.1; // Nur 10% Gas an den echten Motor
+        effectiveNos = 0;   // Knallhart: Kein NOS beim Abwürgen!
     }
 
-    // NOS geht auch nur noch ans Auto, wenn wirklich noch Stoff in der Flasche ist
-    fetch(`/control?gas=${effectiveGas.toFixed(2)}&nos=${(isNosActive && turboCharge > 0) ? 1 : 0}&steer=${steering.toFixed(2)}`)
+    // Hier ist der Fix: Wir senden jetzt unsere abgsicherte Variable "effectiveNos"
+    fetch(`/control?gas=${effectiveGas.toFixed(2)}&nos=${effectiveNos}&steer=${steering.toFixed(2)}`)
         .catch(() => {});
         
     lastSentGas = effectiveGas;
