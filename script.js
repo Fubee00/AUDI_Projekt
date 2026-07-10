@@ -72,10 +72,12 @@ window.addEventListener('touchend', (e) => {
 function sendToESP() {
    if (sendTimeout) return;
     
-    // Die Drossel-Logik (Das Relais)
     let effectiveGas = gas;
+    let effectiveNos = (isNosActive && turboCharge > 0) ? 1 : 0;
+    
     if (isStalling) {
         effectiveGas = 0.1; // Nur 10% Gas an den echten Motor, damit er nicht abhaut!
+        effectiveNos = 0;
     }
 
     // NOS geht auch nur noch ans Auto, wenn wirklich noch Stoff in der Flasche ist
@@ -100,7 +102,7 @@ function update() {
 
     // 1. Abwürg-Logik checken
     let minSpeed = (currentGear - 1) * 35;
-    if (currentGear > 1 && realSpeed < minSpeed && gas > 0) {
+    if (currentGear > 1 && realSpeed < minSpeed && (gas > 0 || isNosActive)) {
         rpmZiel = 1200 + (Math.random() * 800);
         isStalling = true; // Signal an sendToESP: "Motor würgt ab!"
     } else {
