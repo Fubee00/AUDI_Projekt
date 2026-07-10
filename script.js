@@ -6,6 +6,7 @@ const gearDisplay = document.getElementById('gear-val');
 let rpm = 0, currentGear = 1, turboCharge = 0, gas = 0, realSpeed = 0;
 let steering = 0; // Neu für die Lenkung
 let isNosActive = false;
+let isStalling = false;
 const gearRatios = [0, 50, 95, 140, 190, 245, 320];
 
 let activeTouches = {};
@@ -69,16 +70,22 @@ window.addEventListener('touchend', (e) => {
 });
 
 function sendToESP() {
-    if (sendTimeout) return;
+   if (sendTimeout) return;
     
-    // Sende Gas und Lenkung zusammen
-    fetch(`/control?gas=${gas.toFixed(2)}&nos=${isNosActive ? 1 : 0}&steer=${steering.toFixed(2)}`)
+    // Die Drossel-Logik (Das Relais)
+    let effectiveGas = gas;
+    if (isStalling) {
+        effectiveGas = 0.1; // Nur 10% Gas an den echten Motor, damit er nicht abhaut!
+    }
+
+    // NOS geht auch nur noch ans Auto, wenn wirklich noch Stoff in der Flasche ist
+    fetch(`/control?gas=${effectiveGas.toFixed(2)}&nos=${(isNosActive && turboCharge > 0) ? 1 : 0}&steer=${steering.toFixed(2)}`)
         .catch(() => {});
         
-    lastSentGas = gas;
+    lastSentGas = effectiveGas;
     lastSentSteer = steering;
     sendTimeout = true;
-    setTimeout(() => { sendTimeout = false; }, 40); 
+    setTimeout(() => { sendTimeout = false; }, 40);
 }
 
 function shiftGear(dir) {
@@ -89,27 +96,37 @@ function shiftGear(dir) {
 
 function update() {
     let rpmZiel = gas * 8000;
-    if (isNosActive) rpmZiel = 8500;
+    if (isNosActive && turboCharge > 0) rpmZiel = 8500;
 
-    let minSpeed = (currentGear - 1) * 35; 
-    
-    // Wenn du zu langsam für den Gang bist und Gas gibst:
+    // 1. Abwürg-Logik checken
+    let minSpeed = (currentGear - 1) * 35;
     if (currentGear > 1 && realSpeed < minSpeed && gas > 0) {
-        // Motor quält sich und ruckelt nur auf niedrigen Touren rum!
-        rpmZiel = 1200 + (Math.random() * 800); 
+        rpmZiel = 1200 + (Math.random() * 800);
+        isStalling = true; // Signal an sendToESP: "Motor würgt ab!"
+    } else {
+        isStalling = false; // Alles safe
     }
     
     rpm += (rpmZiel - rpm) * 0.15;
-    
     let jitter = (rpm > 7800) ? (Math.random() - 0.5) * 20 : 0;
     
     let speedZiel = (rpm / 8000) * gearRatios[currentGear];
-    if (isNosActive) speedZiel *= 1.2;
+    if (isNosActive && turboCharge > 0) speedZiel *= 1.2;
     realSpeed += (speedZiel - realSpeed) * 0.08;
 
-    if (isNosActive && turboCharge > 0) turboCharge -= 0.7;
-    else if (gas > 0.8) turboCharge = Math.min(turboCharge + 0.3, 100);
-    else turboCharge = Math.max(turboCharge - 0.2, 0);
+    // 2. NFS Most Wanted NOS-Logik
+    if (isNosActive && turboCharge > 0) {
+        turboCharge -= 1.0; // Flasche leert sich schnell beim Drücken
+    } else {
+        // Basis-Recharge (füllt sich immer gaaanz langsam auf)
+        let chargeRate = 0.05; 
+        
+        // ACTION-BOOST: Wenn du ordentlich Gas gibst (>80%) UND gleichzeitig stark lenkst (Drift!)
+        if (gas > 0.8 && Math.abs(steering) > 0.5) {
+            chargeRate = 0.5; // Flasche füllt sich 10x so schnell!
+        }
+        turboCharge = Math.min(turboCharge + chargeRate, 100);
+    }
 
     let angle = -120 + (rpm / 8000) * 240;
     needle.style.transform = `translate(-50%, -82%) rotate(${angle + jitter}deg)`;
