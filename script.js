@@ -121,11 +121,11 @@ function update() {
         turboCharge -= 1.0; // Flasche leert sich schnell beim Drücken
     } else {
         // Basis-Recharge (füllt sich immer gaaanz langsam auf)
-        let chargeRate = 0.05; 
+        let chargeRate = 0.035; 
         
         // ACTION-BOOST: Wenn du ordentlich Gas gibst (>80%) UND gleichzeitig stark lenkst (Drift!)
         if (gas > 0.8 && Math.abs(steering) > 0.5 && !isStalling) {
-            chargeRate = 0.5; // Flasche füllt sich 10x so schnell!
+            chargeRate = 0.3; // Flasche füllt sich 10x so schnell!
         }
         turboCharge = Math.min(turboCharge + chargeRate, 100);
     }
