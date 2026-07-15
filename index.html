@@ -11,6 +11,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dseg@0.46.0/css/dseg.css">
 </head>
 <body>
 
@@ -25,13 +26,14 @@
     <div class="hud-right">
         <div class="tacho-box">
             <img src="tacho_bg.png" class="tacho-bg">
-            <div class="speedo-digital">
-                <span id="gear-val" style="font-size: 28px; color: white; display: block;">1</span>
-                <span id="speed-val" style="font-size: 38px; font-weight: 900; display: block;">000</span>
-                <div style="font-size: 10px; color: #fff; opacity: 0.8;">KM/H</div>
-            </div>
+            <img src="TACH_FILL_00.png" class="tacho-fill" id="tacho-fill">
             <img src="needle.png" id="needle" class="nadel">
+        
+        <div class="speedo-digital">
+            <span id="gear-val">1</span>
+            <span id="speed-val">000</span>
         </div>
+    </div>
         <div class="turbo-unit">
             <img src="turb_bg.png" class="turbo-bg-img">
             <img src="turbo_needle.png" id="turbo-needle" class="turbo-needle">

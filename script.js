@@ -136,8 +136,18 @@ function update() {
     let turboAngle = 50 + (turboCharge * -1.0);
     turboNeedle.style.transform = `translate(-50%, 0) rotate(${turboAngle}deg)`;
 
-    speedDisplay.innerText = Math.floor(realSpeed).toString().padStart(3, '0');
-    
+    // NEUER CODE FÜR DIE GRAUEN NULLEN:
+let speedStr = Math.floor(realSpeed).toString();
+if (speedStr.length === 1) {
+    // 1-stellig (z.B. "5"): Macht "00" blass und die "5" normal
+    speedDisplay.innerHTML = `<span style="opacity: 0.25;">00</span>${speedStr}`;
+} else if (speedStr.length === 2) {
+    // 2-stellig (z.B. "45"): Macht "0" blass und "45" normal
+    speedDisplay.innerHTML = `<span style="opacity: 0.25;">0</span>${speedStr}`;
+} else {
+    // 3-stellig (z.B. "120"): Alles normal
+    speedDisplay.innerHTML = speedStr;
+}    
     requestAnimationFrame(update);
 } 
 update();
