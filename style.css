@@ -53,7 +53,7 @@ body {
     z-index: 100;
 }
 
-.tacho-box { position: relative; width: 220px; height: 220px; }
+.tacho-box { position: relative; width: 220px; height: 220px; flex-shrink: 0; }
 .tacho-bg { width: 100%; height: 100%; object-fit: contain; position: absolute; z-index: 2; }
 .tacho-fill { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1;pointer-events: none; object-fit: contain;filter: sepia(1) saturate(6) hue-rotate(10deg) brightness(1.1) contrast(3); }
 
@@ -63,6 +63,22 @@ body {
 
 #speed-val {
     font-family: 'Digital-7', monospace; font-style: italic; font-size: 44px; -webkit-text-stroke:1.5px #2b1f0e; #2b1f0e; text-shadow: 0 0 2px #e4b365; background-color: none; padding: 2px 12px; border-radius: 4px; line-height: 1; min-width: 80px; text-align: center;
+}
+#speed-unit {
+    position: absolute;
+    /* Hier ist die Stellschraube: 
+       Je kleiner die Prozentzahl, desto weiter wandert es nach unten */
+    bottom: 10%; 
+    left: 50%;
+    transform: translateX(-50%); /* Hält es perfekt in der Mitte */
+    
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    z-index: 15; /* Sicher drüberlegen */
 }
  .nadel {
     position: absolute; height: 50%; top: 50%; left: 50%;
@@ -78,25 +94,17 @@ body {
     transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; background: none5
 }
 
-.turbo-unit { position: relative; width: 200px; height: 80px; margin-top: -35px; z-index: 1; }
-.turbo-bg-img { width: 100%; height: auto; }
+.turbo-unit { position: relative; width: 200px; height: auto; margin-top: -48px; z-index: 1; flex-shrink: 0; }
+.turbo-bg-img { width: 100%; height: auto;object-fit: contain; }
+
+.turbo-bar {
+    position: absolute;top: 52%; left: 51.5%; 
+    transform: translate(-50%, -50%); width: 117.2%; height: 117.2%; object-fit: contain; z-index: 5; pointer-events: none;}
 .turbo-needle {
     position: absolute; height: 120px; left: 50%; top: -60%;
     transform-origin: 50% 5%; z-index: 10;
 }
-.red-line-zone {
-    position: absolute;
-    width: 100%; height: 100%;
-    border-radius: 50%;
-    /* Der Ring */
-    background: radial-gradient(circle, transparent 75%, rgba(255, 0, 0, 0.8) 75%, rgba(255, 0, 0, 0.8) 85%, transparent 85%);
-    /* Das Stück ausschneiden */
-    -webkit-mask: conic-gradient(transparent 45deg, black 45deg, black 125deg, transparent 125deg);
-    mask: conic-gradient(transparent 45deg, black 45deg, black 125deg, transparent 125deg);
-    
-    z-index: 999; /* Jetzt liegt es ÜBER dem Hintergrund, aber UNTER der Nadel */
-    pointer-events: none;
-}
+
 
 #fs-trigger {
     position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
