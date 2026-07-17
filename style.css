@@ -91,7 +91,7 @@ body {
 
 .speedo-digital {
     position: absolute; z-index: 10; bottom: 20%; left: 50%;
-    transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; background: none5
+    transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; background: none
 }
 
 .turbo-unit { 
@@ -102,6 +102,43 @@ body {
 .turbo-bar {
     position: absolute;top: 52%; left: 51.5%; 
     transform: translate(-50%, -50%); width: 117.2%; height: 117.2%; object-fit: contain; z-index: 5; pointer-events: none;}
+
+.turbo-bar-container {
+    width: 120px;
+    height: 120px;
+    position: relative;
+}
+
+.turbo-bar-img {
+    width: 120px;
+    height: 120px;
+    clip-path: inset(0 0 100% 0);
+    pointer-events: none;
+}
+
+.turbo-bar-fill {
+    position: absolute;
+    top: 52%; left: 51.5%;
+    transform: translate(-50%, -50%);
+    width: 117.2%; height: 117.2%;
+    
+    /* 1. DIE MASKE IST WIEDER AKTIV (mit Handy-Sicherung!) */
+    -webkit-mask-image: url('turbo_BAR.png');
+    mask-image: url('turbo_BAR.png');
+    
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    
+    /* 2. Hier kommt unser Tortenstück hin (wird vom JS überschrieben) */
+    background: conic-gradient(from 70deg, #eaff00 0deg, transparent 0deg);
+    
+    z-index: 6; 
+    pointer-events: none !important;
+}
+
 .turbo-needle {
     position: absolute; height: 222px;width: auto; left: 51%; top: 0%;
     transform: translate(50%, 50%) rotate(0deg);

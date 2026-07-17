@@ -2,6 +2,10 @@ const needle = document.getElementById('needle');
 const turboNeedle = document.getElementById('turbo-needle');
 const speedDisplay = document.getElementById('speed-val');
 const gearDisplay = document.getElementById('gear-val');
+const turboBarFill = document.querySelector('.turbo-bar-fill');
+const turboImg = document.getElementById('turbo-bar');
+let lastTurboDegrees = -1;
+
 
 let rpm = 0, currentGear = 1, turboCharge = 0, gas = 0, realSpeed = 0;
 let steering = 0; // Neu für die Lenkung
@@ -97,10 +101,11 @@ function shiftGear(dir) {
 }
 
 function update() {
+    // --- 1. MOTOR-PHYSIK & NOS ---
     let rpmZiel = gas * 9000;
     if (isNosActive && turboCharge > 0) rpmZiel = 8500;
 
-    // 1. Abwürg-Logik checken
+    // 1. Abwürg-Logik
     let minSpeed = (currentGear - 1) * 35;
     if (currentGear > 1 && realSpeed < minSpeed && (gas > 0 || isNosActive)) {
         rpmZiel = 1200 + (Math.random() * 800);
@@ -112,11 +117,12 @@ function update() {
     rpm += (rpmZiel - rpm) * 0.15;
     let jitter = (rpm > 7800) ? (Math.random() - 0.5) * 20 : 0;
     
+    // Speed Berechnung
     let speedZiel = (rpm / 9000) * gearRatios[currentGear];
     if (isNosActive && turboCharge > 0) speedZiel *= 1.2;
     realSpeed += (speedZiel - realSpeed) * 0.08;
 
-    // 2. NFS Most Wanted NOS-Logik
+    // NOS und Turbo berechnen
     if (isNosActive && turboCharge > 0) {
         turboCharge -= 1.0; // Flasche leert sich schnell beim Drücken
     } else {
@@ -129,9 +135,11 @@ function update() {
         }
         turboCharge = Math.min(turboCharge + chargeRate, 100);
     }
+    // A. RPM Nadel
     let safeRpm = Math.max(900, Math.min(rpm, 9000));;
     let angle = -95 + (rpm / 9000) * 156;
     needle.style.transform = `translate(-50%, -82%) rotate(${angle + jitter}deg)`;
+    
 
     // --- NEUE LADEDRUCK-LOGIK ---
 
@@ -169,6 +177,17 @@ turboNeedle.dataset.angle = currentTurboAngle;
 // Update auf das Bild (Achtung: Hier deine korrekten CSS-Translate Werte nehmen!)
 turboNeedle.style.transform = `translate(-50%, 0%) rotate(${currentTurboAngle}deg)`;
 
+// ... in deiner update()-Funktion ...
+
+// 1. Umrechnen (wir runden auf ganze Zahlen, das spart Rechnerei)
+let turboDegrees = Math.floor((turboCharge / 100) * 180);
+
+// 2. NUR Zeichnen, wenn sich der Wert geändert hat
+if (turboDegrees !== lastTurboDegrees) {
+// So polst du den Gradienten um (füllt gegen den Uhrzeigersinn):
+turboBarFill.style.background = `conic-gradient(from 230deg, transparent ${360 - turboDegrees}deg, rgba(255, 255, 0, 0.8) ${360 - turboDegrees}deg)`;
+    lastTurboDegrees = turboDegrees; // Wert speichern
+}
 
     // NEUER CODE FÜR DIE GRAUEN NULLEN:
 let speedStr = Math.floor(realSpeed).toString();
