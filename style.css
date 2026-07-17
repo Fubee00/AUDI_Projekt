@@ -53,7 +53,7 @@ body {
     z-index: 100;
 }
 
-.tacho-box { position: relative; width: 220px; height: 220px; flex-shrink: 0; }
+.tacho-box { position: relative; width: 220px; height: 220px; flex-shrink: 0; top: -30px; }
 .tacho-bg { width: 100%; height: 100%; object-fit: contain; position: absolute; z-index: 2; }
 .tacho-fill { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1;pointer-events: none; object-fit: contain;filter: sepia(1) saturate(6) hue-rotate(10deg) brightness(1.1) contrast(3); }
 
@@ -94,15 +94,18 @@ body {
     transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; background: none5
 }
 
-.turbo-unit { position: relative; width: 200px; height: auto; margin-top: -48px; z-index: 1; flex-shrink: 0; }
+.turbo-unit { 
+    position: absolute; top: 172px; /* Hier schiebst du nur den Turbo-Bogen hoch/runter */left: 50%; left: calc(50% + 3px);transform: translateX(-50%);width: 200px; z-index: 1; 
+}
 .turbo-bg-img { width: 100%; height: auto;object-fit: contain; }
 
 .turbo-bar {
     position: absolute;top: 52%; left: 51.5%; 
     transform: translate(-50%, -50%); width: 117.2%; height: 117.2%; object-fit: contain; z-index: 5; pointer-events: none;}
 .turbo-needle {
-    position: absolute; height: 120px; left: 50%; top: -60%;
-    transform-origin: 50% 5%; z-index: 10;
+    position: absolute; height: 96px; left: 51%; top: 50%;
+    transform: translate(-50%, -100%) rotate(0deg);
+    transform-origin: 50%  0%; z-index: 10;
 }
 
 
