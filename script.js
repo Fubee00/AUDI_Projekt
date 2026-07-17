@@ -97,7 +97,7 @@ function shiftGear(dir) {
 }
 
 function update() {
-    let rpmZiel = gas * 8000;
+    let rpmZiel = gas * 9000;
     if (isNosActive && turboCharge > 0) rpmZiel = 8500;
 
     // 1. Abwürg-Logik checken
@@ -112,7 +112,7 @@ function update() {
     rpm += (rpmZiel - rpm) * 0.15;
     let jitter = (rpm > 7800) ? (Math.random() - 0.5) * 20 : 0;
     
-    let speedZiel = (rpm / 8000) * gearRatios[currentGear];
+    let speedZiel = (rpm / 9000) * gearRatios[currentGear];
     if (isNosActive && turboCharge > 0) speedZiel *= 1.2;
     realSpeed += (speedZiel - realSpeed) * 0.08;
 
@@ -129,12 +129,46 @@ function update() {
         }
         turboCharge = Math.min(turboCharge + chargeRate, 100);
     }
-
-    let angle = -120 + (rpm / 8000) * 240;
+    let safeRpm = Math.max(900, Math.min(rpm, 9000));;
+    let angle = -95 + (rpm / 9000) * 156;
     needle.style.transform = `translate(-50%, -82%) rotate(${angle + jitter}deg)`;
 
-    let turboAngle = 50 + (turboCharge * -1.0);
-    turboNeedle.style.transform = `translate(-50%, 0) rotate(${turboAngle}deg)`;
+    // --- NEUE LADEDRUCK-LOGIK ---
+
+// Basis: Nadel startet in der Mitte (0 Grad)
+let targetBoostAngle = 0;
+
+if (gas > 0.1) {
+    if (rpm < 2800) {
+        // Turboloch: Nadel geht leicht ins Vakuum (nach links, z.B. -45 Grad)
+        targetBoostAngle = -45; 
+    } else {
+        // Druck baut sich auf: Je mehr Gas und RPM, desto weiter rechts
+        // Mit (rpm/9000) * 90 skalieren wir den Ausschlag
+        targetBoostAngle = (rpm / 9000) * 90 * gas;
+    }
+} else {
+    // Fuß vom Gas: Ladedruck fällt ab (geht auf 0)
+    targetBoostAngle = 0;
+}
+
+// NOS ballert extra Druck drauf, wenn aktiv
+if (isNosActive && turboCharge > 0) {
+    targetBoostAngle += 30;
+}
+
+// Begrenzer, damit die Nadel nicht durchs Armaturenbrett fliegt
+targetBoostAngle = Math.max(-60, Math.min(47, targetBoostAngle));
+
+
+// Glättung für die flüssige Bewegung (der "Most Wanted" Vibe)
+let currentTurboAngle = parseFloat(turboNeedle.dataset.angle || 0);
+currentTurboAngle += (targetBoostAngle - currentTurboAngle) * 0.1;
+turboNeedle.dataset.angle = currentTurboAngle;
+
+// Update auf das Bild (Achtung: Hier deine korrekten CSS-Translate Werte nehmen!)
+turboNeedle.style.transform = `translate(-50%, 0%) rotate(${currentTurboAngle}deg)`;
+
 
     // NEUER CODE FÜR DIE GRAUEN NULLEN:
 let speedStr = Math.floor(realSpeed).toString();

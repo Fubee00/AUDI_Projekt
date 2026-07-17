@@ -15,7 +15,7 @@
 }
 
 body { 
-    background-color: #000; 
+    background-color: #0a192f; 
     margin: 0; padding: 0;
     width: 100vw; height: 100dvh;
     overflow: hidden; 
@@ -54,7 +54,7 @@ body {
 }
 
 .tacho-box { position: relative; width: 220px; height: 220px; flex-shrink: 0; top: -30px; }
-.tacho-bg { width: 100%; height: 100%; object-fit: contain; position: absolute; z-index: 2; }
+.tacho-bg { width: 100%; height: 100%; object-fit: contain; position: absolute; z-index: 4; }
 .tacho-fill { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1;pointer-events: none; object-fit: contain;filter: sepia(1) saturate(6) hue-rotate(10deg) brightness(1.1) contrast(3); }
 
 #gear-val {
@@ -81,7 +81,7 @@ body {
     z-index: 15; /* Sicher drüberlegen */
 }
  .nadel {
-    position: absolute; height: 50%; top: 50%; left: 50%;
+    position: absolute; height: 60%; top: 50%; left: 50%;
     transform-origin: 50% 82%;
     transform: translate(-50%, -82%) rotate(-120deg);
     pointer-events: none;
@@ -103,9 +103,21 @@ body {
     position: absolute;top: 52%; left: 51.5%; 
     transform: translate(-50%, -50%); width: 117.2%; height: 117.2%; object-fit: contain; z-index: 5; pointer-events: none;}
 .turbo-needle {
-    position: absolute; height: 96px; left: 51%; top: 50%;
-    transform: translate(-50%, -100%) rotate(0deg);
-    transform-origin: 50%  0%; z-index: 10;
+    position: absolute; height: 222px;width: auto; left: 51%; top: 0%;
+    transform: translate(50%, 50%) rotate(0deg);
+    transform-origin: 50%  50%; z-index: 10;}
+
+.redline {
+    position: absolute; width: 100%; height: 102%; top: -4px; left: -6px; z-index: 3;pointer-events: none;transform-origin: center;
+    filter: invert(24%) sepia(99%) saturate(7469%) hue-rotate(355deg) brightness(101%) contrast(114%);
+    
+    /* HIER PASST DU ES AN: */
+    /* Du musst mit der 'rotate'-Zahl spielen, bis das Segment 
+       genau über dem roten Bereich auf deinem Tacho liegt. */
+    transform: rotate(3deg) scale(1.12); 
+    
+    /* Falls die Grafik etwas zu groß oder zu klein ist: */
+    object-fit: contain;
 }
 
 
