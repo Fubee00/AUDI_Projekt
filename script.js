@@ -206,6 +206,18 @@ if (speedStr.length === 1) {
 update();
 
 document.getElementById('fs-trigger').addEventListener('click', () => {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-    else document.exitFullscreen();
+    const elem = document.documentElement;
+    if (!document.fullscreenElement) {
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) { /* Safari / iOS spezifisch */
+            elem.webkitRequestFullscreen();
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) { /* Safari / iOS spezifisch */
+            document.webkitExitFullscreen();
+        }
+    }
 });
