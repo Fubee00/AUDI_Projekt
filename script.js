@@ -101,106 +101,157 @@ function shiftGear(dir) {
 }
 
 function update() {
-    // --- 1. MOTOR-PHYSIK & NOS ---
-    let rpmZiel = gas * 9000;
-    if (isNosActive && turboCharge > 0) rpmZiel = 8500;
 
-    // 1. Abwürg-Logik
-    let minSpeed = (currentGear - 1) * 35;
-    if (currentGear > 1 && realSpeed < minSpeed && (gas > 0 || isNosActive)) {
-        rpmZiel = 1200 + (Math.random() * 800);
-        isStalling = true; // Signal an sendToESP: "Motor würgt ab!"
-    } else {
-        isStalling = false; // Alles safe
-    }
-    
-    rpm += (rpmZiel - rpm) * 0.15;
-    let jitter = (rpm > 7800) ? (Math.random() - 0.5) * 20 : 0;
-    
-    // Speed Berechnung
-    let speedZiel = (rpm / 9000) * gearRatios[currentGear];
-    if (isNosActive && turboCharge > 0) speedZiel *= 1.2;
-    realSpeed += (speedZiel - realSpeed) * 0.08;
-
-    // NOS und Turbo berechnen
-    if (isNosActive && turboCharge > 0) {
-        turboCharge -= 1.0; // Flasche leert sich schnell beim Drücken
-    } else {
-        // Basis-Recharge (füllt sich immer gaaanz langsam auf)
-        let chargeRate = 0.035; 
+try {
+       // ==========================================
+        // SCHALTSCHRANK 1: PHYSIK & RECHNEN
+        // ==========================================
         
-        // ACTION-BOOST: Wenn du ordentlich Gas gibst (>80%) UND gleichzeitig stark lenkst (Drift!)
-        if (gas > 0.8 && Math.abs(steering) > 0.5 && !isStalling) {
-            chargeRate = 0.3; // Flasche füllt sich 10x so schnell!
+        let currentSafeGear = Math.max(1, currentGear); 
+        let maxSpeedImGang = gearRatios[currentSafeGear] || 300; 
+        if (isNosActive && turboCharge > 0) maxSpeedImGang *= 1.15; 
+
+        // 1. UNTERTOURIG / ABWÜRG-LOGIK
+        let minSpeed = (currentSafeGear - 1) * 20; 
+        let isStalling = (currentSafeGear > 1 && realSpeed < minSpeed);
+
+        // 2. BESCHLEUNIGEN & MOTORBREMSE
+        let enginePower = 0;
+        let isBoosting = (isNosActive && turboCharge > 0);
+
+        if (realSpeed > maxSpeedImGang + 4) {
+            // OVER-REV! (Du hast bei Vollgas brutal runtergeschaltet)
+            // Brutale, aber realistische Motorbremse (0.4 statt 2.5 Betonwand)
+            realSpeed -= 0.4; 
+        } else {
+            // NORMALES FAHREN
+            if (gas > 0 || isBoosting) {
+                if (isStalling) {
+                    enginePower = -0.3; // Motor quält sich untertourig
+                } else {
+                    let effectiveGas = Math.max(gas, isBoosting ? 0.5 : 0);
+
+                    enginePower = (1.5 / currentSafeGear) * gas;
+                    if (isNosActive && turboCharge > 0) enginePower *= 2.5;
+
+                    if (isStalling && enginePower > 0) enginePower = -0.8;
+
+                    enginePower = (1.5 / currentSafeGear) * effectiveGas;
+                    
+                    // NOS gibt den extra Kick
+                    if (isBoosting) enginePower *= 2.5;
+                }
+                
+                realSpeed += enginePower;
+                
+                // DER BEGRENZER: Deckelt die Geschwindigkeit im aktuellen Gang
+                // (Das ist der Grund, warum du "stuck" bist -> Du MUSST schalten!)
+                if (realSpeed > maxSpeedImGang) {
+                    realSpeed = maxSpeedImGang; 
+                }
+            } else {
+                // Fuß vom Gas
+                realSpeed -= 0.15; 
+            }
         }
-        turboCharge = Math.min(turboCharge + chargeRate, 100);
-    }
+
+        if (realSpeed < 0) realSpeed = 0;
+
+        // 3. DREHZAHL BERECHNEN (Jetzt mit perfektem Nadel-Verhalten)
+        let rpmZiel = 900; 
+
+        if (realSpeed > maxSpeedImGang + 2) {
+            // MOTOR SCHREIT (Runterschalten bei 200 km/h)
+            rpmZiel = 9500 + (Math.random() * 200); 
+        } else if (isStalling && gas > 0) {
+            // MOTOR HUSTET (Abwürgen)
+            rpmZiel = 800 + (Math.random() * 200); 
+        } else {
+            // NORMALER VORTRIEB
+            rpmZiel = (realSpeed / maxSpeedImGang) * 9000;
+            
+            // BEGRENZER-BOUNCING: Nadel stottert bei 9000 Touren (Brap-brap-brap)
+            if (realSpeed >= maxSpeedImGang && gas > 0 && currentSafeGear < 6) {
+                rpmZiel = 8900 + (Math.random() * 200); 
+            }
+        }
+
+        // Schwungrad-Effekt: Macht die Nadel butterweich
+        rpm += (rpmZiel - rpm) * 0.3; 
+        
+        if (rpm < 900) rpm = 900; // Standgas-Boden
+        let jitter = (rpm > 8500) ? (Math.random() - 0.5) * 20 : 0;
+
+        // --- 4. NOS / Flaschen-Logik ---
+        if (isNosActive && turboCharge > 0) {
+            turboCharge -= 1.0; 
+        } else {
+            let chargeRate = 0.035; 
+            if (gas > 0.8 && Math.abs(steering) > 0.5 && !isStalling) {
+                chargeRate = 0.3; 
+            }
+            turboCharge = Math.min(turboCharge + chargeRate, 100);
+        }
+        
+        // --- 5. Ladedruck-Logik ---
+        let targetBoostAngle = 0;
+        if (gas > 0.1 && !isStalling && realSpeed <= maxSpeedImGang + 2) {
+            if (rpm < 2800) {
+                targetBoostAngle = -45; // Turboloch
+            } else {
+                targetBoostAngle = (rpm / 9000) * 90 * gas; 
+            }
+        }
+        if (isNosActive && turboCharge > 0) targetBoostAngle += 30;
+        targetBoostAngle = Math.max(-60, Math.min(47, targetBoostAngle)); 
+
+        let currentTurboAngle = parseFloat(turboNeedle.dataset.angle || 0);
+        currentTurboAngle += (targetBoostAngle - currentTurboAngle) * 0.1; 
+        turboNeedle.dataset.angle = currentTurboAngle;
+    // Update auf das Bild (Achtung: Hier deine korrekten CSS-Translate Werte nehmen!)
+
+
+        // ==========================================
+        // SCHALTSCHRANK 2: GRAFIK AUFS DISPLAY BRINGEN
+        // ==========================================
+
     // A. RPM Nadel
-    let safeRpm = Math.max(900, Math.min(rpm, 9000));;
+    let safeRpm = Math.max(900, Math.min(rpm, 9000));
     let angle = -95 + (rpm / 9000) * 156;
     needle.style.transform = `translate(-50%, -82%) rotate(${angle + jitter}deg)`;
-    
 
-    // --- NEUE LADEDRUCK-LOGIK ---
-
-// Basis: Nadel startet in der Mitte (0 Grad)
-let targetBoostAngle = 0;
-
-if (gas > 0.1) {
-    if (rpm < 2800) {
-        // Turboloch: Nadel geht leicht ins Vakuum (nach links, z.B. -45 Grad)
-        targetBoostAngle = -45; 
-    } else {
-        // Druck baut sich auf: Je mehr Gas und RPM, desto weiter rechts
-        // Mit (rpm/9000) * 90 skalieren wir den Ausschlag
-        targetBoostAngle = (rpm / 9000) * 90 * gas;
+    // B. Turbo Nadel(mechanisch)
+    if(turboNeedle) {
+        turboNeedle.style.transform = `translate(-50%, -0%) rotate(${currentTurboAngle}deg)`;
     }
-} else {
-    // Fuß vom Gas: Ladedruck fällt ab (geht auf 0)
-    targetBoostAngle = 0;
-}
 
-// NOS ballert extra Druck drauf, wenn aktiv
-if (isNosActive && turboCharge > 0) {
-    targetBoostAngle += 30;
-}
-
-// Begrenzer, damit die Nadel nicht durchs Armaturenbrett fliegt
-targetBoostAngle = Math.max(-60, Math.min(47, targetBoostAngle));
-
-
-// Glättung für die flüssige Bewegung (der "Most Wanted" Vibe)
-let currentTurboAngle = parseFloat(turboNeedle.dataset.angle || 0);
-currentTurboAngle += (targetBoostAngle - currentTurboAngle) * 0.1;
-turboNeedle.dataset.angle = currentTurboAngle;
-
-// Update auf das Bild (Achtung: Hier deine korrekten CSS-Translate Werte nehmen!)
-turboNeedle.style.transform = `translate(-50%, 0%) rotate(${currentTurboAngle}deg)`;
-
-// ... in deiner update()-Funktion ...
-
-// 1. Umrechnen (wir runden auf ganze Zahlen, das spart Rechnerei)
-let turboDegrees = Math.floor((turboCharge / 100) * 180);
-
-// 2. NUR Zeichnen, wenn sich der Wert geändert hat
-if (turboDegrees !== lastTurboDegrees) {
-// So polst du den Gradienten um (füllt gegen den Uhrzeigersinn):
-turboBarFill.style.background = `conic-gradient(from 230deg, transparent ${360 - turboDegrees}deg, rgba(255, 255, 0, 0.8) ${360 - turboDegrees}deg)`;
-    lastTurboDegrees = turboDegrees; // Wert speichern
-}
+    // C. Turbo Bar (grafisch)
+    let turboDegrees = Math.floor((turboCharge / 100) * 180);
+    // 2. NUR Zeichnen, wenn sich der Wert geändert hat
+    if (turboDegrees !== lastTurboDegrees) {
+    // So polst du den Gradienten um (füllt gegen den Uhrzeigersinn) 230° ist die Startposition, 360° ist das Ende:
+        turboBarFill.style.background = `conic-gradient(from 230deg, transparent ${360 - turboDegrees}deg, rgba(255, 255, 0, 0.8) ${360 - turboDegrees}deg)`;
+        lastTurboDegrees = turboDegrees; // Wert speichern
+    }
 
     // NEUER CODE FÜR DIE GRAUEN NULLEN:
-let speedStr = Math.floor(realSpeed).toString();
-if (speedStr.length === 1) {
+    let speedStr = Math.floor(realSpeed).toString();
+    if (speedStr.length === 1) {
     // 1-stellig (z.B. "5"): Macht "00" blass und die "5" normal
-    speedDisplay.innerHTML = `<span style="opacity: 0.25;">00</span>${speedStr}`;
-} else if (speedStr.length === 2) {
+        speedDisplay.innerHTML = `<span style="opacity: 0.25;">00</span>${speedStr}`;
+    } else if (speedStr.length === 2) {
     // 2-stellig (z.B. "45"): Macht "0" blass und "45" normal
-    speedDisplay.innerHTML = `<span style="opacity: 0.25;">0</span>${speedStr}`;
-} else {
+        speedDisplay.innerHTML = `<span style="opacity: 0.25;">0</span>${speedStr}`;
+    } else {
     // 3-stellig (z.B. "120"): Alles normal
-    speedDisplay.innerHTML = speedStr;
-}    
+        speedDisplay.innerHTML = speedStr;
+    }
+}
+    catch (fehler) {
+        // Der Touch-Retter
+        console.error("Kabelbrand im Code:", fehler);
+    }
+
     requestAnimationFrame(update);
 } 
 update();

@@ -26,25 +26,84 @@ body {
 }
 
 .controls-left {
-    padding: env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 25px);
-    display: flex; flex-direction: column;
-    gap: 15px; z-index: 200;
+    position: fixed;
+    left: 20px;
+    bottom: 40px;
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; 
+    z-index: 200;
+}
+
+.controls-row {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
 }
 
 #nos-btn {
-    width: 80px; height: 80px; border-radius: 50%;
-    border: 2px solid #0099ff; background: rgba(0, 150, 255, 0.2);
-    display: flex; justify-content: center; align-items: center; 
-    color: white; font-size: 16px; margin-bottom: 10px;
-    transition: transform 0.1s;
+    width: 80px; 
+    height: 80px; 
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #4da6ff, #0066cc);
+    border: 2px solid #fff;
+    box-shadow: 0 0 15px #0099ff, inset 0 0 10px rgba(255,255,255,0.3);
+    
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    color: white; 
+    font-weight: bold; 
+    font-size: 14px;
+    transition: all 0.1s ease;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-family: 'Orbitron', sans-serif;
+    user-select: none;
 }
-#nos-btn:active { transform: scale(0.9); background: rgba(0, 150, 255, 0.5); }
+
+#nos-btn:active { 
+    transform: scale(0.92); 
+    background: radial-gradient(circle at 30% 30%, #003d99, #001a4d);
+    box-shadow: 0 0 8px #0099ff inset, 0 0 3px #0099ff;
+}
+
+#nos-btn:hover {
+    box-shadow: 0 0 20px #0099ff, inset 0 0 10px rgba(255,255,255,0.3);
+}
 
 .btn-gear {
-    width: 80px; height: 80px; background: rgba(255, 255, 255, 0.1);
-    border: 2px solid #fff; color: white; font-size: 35px;
-    display: flex; justify-content: center; align-items: center; border-radius: 12px;
+    width: 80px; 
+    height: 80px; 
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid #fff; 
+    color: white; 
+    font-size: 30px;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    backdrop-filter: blur(5px);
+    transition: all 0.1s;
+    cursor: pointer;
+    user-select: none;
+    font-family: 'Orbitron', sans-serif;
 }
+
+.btn-gear:active {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #4da6ff;
+    transform: scale(0.95);
+    box-shadow: 0 0 10px rgba(77, 166, 255, 0.5);
+}
+
+.btn-gear:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #4da6ff;
+}
+
 
 .hud-right {
     padding: env(safe-area-inset-bottom, 15px) env(safe-area-inset-right, 20px);
@@ -133,7 +192,7 @@ body {
     mask-repeat: no-repeat;
     
     /* 2. Hier kommt unser Tortenstück hin (wird vom JS überschrieben) */
-    background: conic-gradient(from 70deg, #eaff00 0deg, transparent 0deg);
+    background: conic-gradient(from 180deg, #eaff00 0deg, transparent 0deg);
     
     z-index: 6; 
     pointer-events: none !important;
