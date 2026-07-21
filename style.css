@@ -43,12 +43,12 @@ body {
 }
 
 #nos-btn {
-    width: 80px; 
+   width: 80px; 
     height: 80px; 
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #4da6ff, #0066cc);
+    background: radial-gradient(circle at 30% 30%, #fbc072, #d9860a);
     border: 2px solid #fff;
-    box-shadow: 0 0 15px #0099ff, inset 0 0 10px rgba(255,255,255,0.3);
+    box-shadow: 0 0 15px #fbc072, inset 0 0 10px rgba(255,255,255,0.3);
     
     display: flex; 
     justify-content: center; 
@@ -65,12 +65,12 @@ body {
 
 #nos-btn:active { 
     transform: scale(0.92); 
-    background: radial-gradient(circle at 30% 30%, #003d99, #001a4d);
-    box-shadow: 0 0 8px #0099ff inset, 0 0 3px #0099ff;
+    background: radial-gradient(circle at 30% 30%, #d9860a, #8b5400);
+    box-shadow: 0 0 8px #fbc072 inset, 0 0 3px #fbc072; 
 }
 
 #nos-btn:hover {
-    box-shadow: 0 0 20px #0099ff, inset 0 0 10px rgba(255,255,255,0.3);
+   box-shadow: 0 0 20px #fbc072, inset 0 0 10px rgba(255,255,255,0.3);
 }
 
 .btn-gear {
@@ -94,20 +94,25 @@ body {
 
 .btn-gear:active {
     background: rgba(255, 255, 255, 0.15);
-    border-color: #4da6ff;
+    border-color: #fbc072;
     transform: scale(0.95);
-    box-shadow: 0 0 10px rgba(77, 166, 255, 0.5);
+    box-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
 
 .btn-gear:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: #4da6ff;
+    border-color: #fbc072;
 }
 
 
 .hud-right {
+    position: fixed;
+    right: 25px;
+    bottom:10px;
     padding: env(safe-area-inset-bottom, 15px) env(safe-area-inset-right, 20px);
-    display: flex; flex-direction: column; align-items: center;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
     width: 260px;
     z-index: 100;
 }
@@ -192,7 +197,7 @@ body {
     mask-repeat: no-repeat;
     
     /* 2. Hier kommt unser Tortenstück hin (wird vom JS überschrieben) */
-    background: conic-gradient(from 180deg, #eaff00 0deg, transparent 0deg);
+    background: conic-gradient(from 180deg, #fbc072 0deg, transparent 0deg);
     
     z-index: 6; 
     pointer-events: none !important;

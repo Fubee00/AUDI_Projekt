@@ -230,7 +230,7 @@ try {
     // 2. NUR Zeichnen, wenn sich der Wert geändert hat
     if (turboDegrees !== lastTurboDegrees) {
     // So polst du den Gradienten um (füllt gegen den Uhrzeigersinn) 230° ist die Startposition, 360° ist das Ende:
-        turboBarFill.style.background = `conic-gradient(from 230deg, transparent ${360 - turboDegrees}deg, rgba(255, 255, 0, 0.8) ${360 - turboDegrees}deg)`;
+        turboBarFill.style.background = `conic-gradient(from 230deg, transparent ${360 - turboDegrees}deg, #fbc072 ${360 - turboDegrees}deg)`;
         lastTurboDegrees = turboDegrees; // Wert speichern
     }
 
