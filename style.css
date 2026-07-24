@@ -329,3 +329,31 @@ body {
     font-size: 10px; 
     z-index: 1000;
 }
+
+#rotate-warning {
+    display: none; /* Standardmäßig ausgeblendet */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background-color: #050505; /* Tiefes, dunkles Schwarz */
+    z-index: 999999; /* Das muss über allem liegen! */
+    justify-content: center;
+    align-items: center;
+}
+
+.rotate-img {
+    width: 90vw; /* Passt sich der Handybreite an */
+    max-width: 600px; /* Wird auf großen Bildschirmen nicht zu riesig */
+    object-fit: contain;
+    /* Verpasst dem Bild einen leichten NFS-Glow, damit es nicht so flach wirkt */
+    filter: drop-shadow(0 0 20px rgba(251, 192, 114, 0.4)); 
+}
+
+/* Der Magie-Schalter: Aktiviert das Overlay nur im Hochformat */
+@media (orientation: portrait) {
+    #rotate-warning {
+        display: flex;
+    }
+}

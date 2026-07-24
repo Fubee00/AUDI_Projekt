@@ -14,6 +14,11 @@
 </head>
 <body>
 
+    <!-- NEU: Das Warn-Overlay zwingt den User mit dem Bild ins Querformat -->
+    <div id="rotate-warning">
+        <img src="Handy roatate.png" alt="Bitte ins Querformat drehen" class="rotate-img">
+    </div>
+
     <button id="fs-trigger">FULLSCREEN</button>
 
     <!-- Linke Seite: NOS-Button -->
@@ -37,14 +42,19 @@
         
             <!-- Digitale Anzeige mit Glas-Fade -->
             <div class="speedo-digital">
+                <!-- Gang Anzeige -->
                 <span id="gear-val">
                     <span class="gear-bg">8</span>
                     <span id="gear-num">1</span>
                 </span>
-                <span id="speed-val">888</span>
+                
+                <!-- FIX: Tempo Anzeige mit Hintergrund-8ern! -->
+                <span id="speed-val">
+                    <span class="speed-bg">888</span>
+                    <span id="speed-num">000</span>
+                </span>
             </div>
             
-
             <span id="speed-unit">MPH</span>
 
             <div class="turbo-unit">
