@@ -1,21 +1,25 @@
-
-   @font-face {
+@font-face {
     font-family: 'Digital-7';
-    /* WICHTIG: Der Dateiname hier in den Klammern muss EXAKT so heißen wie deine Datei im Ordner! */
     src: url('digital-7-italic.ttf') format('truetype'); 
     font-weight: normal;
     font-style: italic;
 } 
+
 * {
     box-sizing: border-box; 
     -webkit-tap-highlight-color: transparent; 
-    touch-action: none; 
+    touch-action: manipulation; 
     -webkit-user-select: none;
     user-select: none;
 }
 
 body { 
-    background-color: #0a192f; 
+    background-image: url('https://i.ytimg.com/vi/IuOpujisdIM/maxresdefault.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+
     margin: 0; padding: 0;
     width: 100vw; height: 100dvh;
     overflow: hidden; 
@@ -25,6 +29,7 @@ body {
     justify-content: space-between; 
 }
 
+/* Linke Controller-Box */
 .controls-left {
     position: fixed;
     left: 20px;
@@ -36,20 +41,13 @@ body {
     z-index: 200;
 }
 
-.controls-row {
-    display: flex;
-    gap: 30px;
-    justify-content: center;
-}
-
 #nos-btn {
-   width: 80px; 
+    width: 80px; 
     height: 80px; 
     border-radius: 50%;
     background: radial-gradient(circle at 30% 30%, #fbc072, #d9860a);
     border: 2px solid #fff;
     box-shadow: 0 0 15px #fbc072, inset 0 0 10px rgba(255,255,255,0.3);
-    
     display: flex; 
     justify-content: center; 
     align-items: center; 
@@ -69,161 +67,265 @@ body {
     box-shadow: 0 0 8px #fbc072 inset, 0 0 3px #fbc072; 
 }
 
-#nos-btn:hover {
-   box-shadow: 0 0 20px #fbc072, inset 0 0 10px rgba(255,255,255,0.3);
-}
-
-.btn-gear {
-    width: 80px; 
-    height: 80px; 
-    background: rgba(0, 0, 0, 0.4);
-    border: 2px solid #fff; 
-    color: white; 
-    font-size: 30px;
-    font-weight: bold;
-    border-radius: 50%;
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    backdrop-filter: blur(5px);
-    transition: all 0.1s;
-    cursor: pointer;
-    user-select: none;
-    font-family: 'Orbitron', sans-serif;
-}
-
-.btn-gear:active {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: #fbc072;
-    transform: scale(0.95);
-    box-shadow: 0 0 10px rgba(255,255,255,0.3);
-}
-
-.btn-gear:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: #fbc072;
-}
-
-
+/* Rechte HUD-Box -> Lässt den Touch komplett durch! */
 .hud-right {
     position: fixed;
     right: 25px;
-    bottom:10px;
+    bottom: 10px;
     padding: env(safe-area-inset-bottom, 15px) env(safe-area-inset-right, 20px);
     display: flex; 
     flex-direction: column; 
     align-items: center;
     width: 260px;
     z-index: 100;
+    pointer-events: none; 
 }
 
-.tacho-box { position: relative; width: 220px; height: 220px; flex-shrink: 0; top: -30px; }
-.tacho-bg { width: 100%; height: 100%; object-fit: contain; position: absolute; z-index: 4; }
-.tacho-fill { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1;pointer-events: none; object-fit: contain;filter: sepia(1) saturate(6) hue-rotate(10deg) brightness(1.1) contrast(3); }
+.tacho-box { 
+    position: relative; 
+    width: 220px; 
+    height: 220px; 
+    flex-shrink: 0; 
+    top: -30px; 
+}
+
+.tacho-bg { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: contain; 
+    position: absolute; 
+    z-index: 4; 
+    pointer-events: none;
+}
+
+.tacho-fill { 
+    width: 100%; 
+    height: 100%; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    z-index: 1; 
+    pointer-events: none; 
+    object-fit: contain; 
+}
+
+.tacho-maske {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    object-fit: contain; 
+    z-index: 2; 
+    pointer-events: none;
+    filter: brightness(0) saturate(100%) invert(93%) sepia(9%) saturate(5673%) hue-rotate(312deg) brightness(112%) contrast(97%);
+}
+
+/* DIE REINEN ZAHLEN-TEXTE OHNE CSS-FARBVERLAUF */
+#gear-val, #speed-val {
+    font-family: 'Digital-7', monospace; 
+    font-style: italic; 
+    -webkit-text-stroke: 1px #0a0a0a; 
+    color: #070707; /* Reiner, cleaner Text */
+    background: transparent; /* Kein Verlauf mehr, die Grafik im Hintergrund macht die Farbe! */
+    border: none;
+    box-shadow: none;
+    position: relative;
+    z-index: 2;
+    line-height: 1; 
+    text-align: center;
+    
+}
+
 
 #gear-val {
-    font-family: 'Digital-7', monospace; font-style: italic; font-size: 25px; -webkit-text-stroke: 1.5px #2b1f0e; color: #2b1f0e; background-color: none; padding: 2px 10px; border-radius: 3px; line-height: 1; min-width: 30px; text-align: center; margin-bottom: 35px;
+   position: relative;
+    display: inline-block;
+    width: 35px; /* Fester Slot, damit 1 bis 6 perfekt zentriert bleiben */
+    text-align: right;
+    padding-right: 10px;
+    font-family: 'Digital-7', monospace; 
+    font-style: italic; 
+    -webkit-text-stroke: 1px #0a0a0a; 
+    color: #070707; 
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    z-index: 2;
+    line-height: 1; 
+    font-size: 28px; /* Wieder die originale Größe */
+    margin-bottom: 31px; /* Wieder am exakten Platz im Fenster */ 
+}
+
+#gear-val::before {
+    content: "8";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #070707;
+    opacity: 0.22; 
+    z-index: -1;
+    pointer-events: none;
 }
 
 #speed-val {
-    font-family: 'Digital-7', monospace; font-style: italic; font-size: 44px; -webkit-text-stroke:1.5px #2b1f0e; #2b1f0e; text-shadow: 0 0 2px #e4b365; background-color: none; padding: 2px 12px; border-radius: 4px; line-height: 1; min-width: 80px; text-align: center;
+    font-size: 46px; 
+    min-width: 80px;
 }
+
+.box-img {
+    display: block;
+    object-fit: cover;
+    pointer-events: none;
+    z-index: 1;
+}
+
 #speed-unit {
     position: absolute;
-    /* Hier ist die Stellschraube: 
-       Je kleiner die Prozentzahl, desto weiter wandert es nach unten */
     bottom: 10%; 
     left: 50%;
-    transform: translateX(-50%); /* Hält es perfekt in der Mitte */
-    
+    transform: translateX(-50%); 
     font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: 900;
+    -webkit-text-stroke: 0.6px white; /* Macht die Buchstaben physisch dicker */
     color: white;
-    letter-spacing: 1px;
+    letter-spacing: 0px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    z-index: 15; /* Sicher drüberlegen */
+    z-index: 15; 
+    pointer-events: none;
 }
- .nadel {
-    position: absolute; height: 60%; top: 50%; left: 50%;
+
+.nadel {
+    position: absolute; 
+    height: 60%; 
+    top: 50%; 
+    left: 50%;
     transform-origin: 50% 82%;
     transform: translate(-50%, -82%) rotate(-120deg);
     pointer-events: none;
-    transition: transform 0.05s linear; /* Sorgt für smoothe Bewegung */
-    z-index: 4;
+    transition: transform 0.05s linear; 
+    z-index: 999;
+    filter: brightness(0) saturate(100%) invert(75%) sepia(50%) saturate(1000%) hue-rotate(330deg) brightness(105%) contrast(102%);
 }
 
 .speedo-digital {
-    position: absolute; z-index: 10; bottom: 20%; left: 50%;
-    transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; background: none
+    position: absolute; 
+    z-index: 5; 
+    bottom: 20%; 
+    left: 50%;
+    transform: translateX(-50%); 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 10px; 
+    background: none;
+    pointer-events: none;
 }
+
+.tacho-boxes {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    object-fit: contain; 
+    z-index: 3; 
+    pointer-events: none;
+    
+    /* NFS-Orange-Farbe */
+    filter: brightness(0) saturate(100%) invert(75%) sepia(50%) saturate(1000%) hue-rotate(330deg) brightness(105%) contrast(102%);
+    
+    /* Der echte Glas-Effekt: Leicht durchsichtiges, getöntes Cockpit-Glas */
+    ; 
+}
+
+
 
 .turbo-unit { 
-    position: absolute; top: 172px; /* Hier schiebst du nur den Turbo-Bogen hoch/runter */left: 50%; left: calc(50% + 3px);transform: translateX(-50%);width: 200px; z-index: 1; 
+    position: absolute; 
+    top: 172px; 
+    left: calc(50% + 3px);
+    transform: translateX(-50%);
+    width: 200px; 
+    z-index: 1; 
+    pointer-events: none;
 }
-.turbo-bg-img { width: 100%; height: auto;object-fit: contain; }
+
+.turbo-bg-img { 
+    width: 100%; 
+    height: auto;
+    object-fit: contain; 
+}
 
 .turbo-bar {
-    position: absolute;top: 52%; left: 51.5%; 
-    transform: translate(-50%, -50%); width: 117.2%; height: 117.2%; object-fit: contain; z-index: 5; pointer-events: none;}
-
-.turbo-bar-container {
-    width: 120px;
-    height: 120px;
-    position: relative;
-}
-
-.turbo-bar-img {
-    width: 120px;
-    height: 120px;
-    clip-path: inset(0 0 100% 0);
+    position: absolute;
+    top: 52%; 
+    left: 51.5%; 
+    transform: translate(-50%, -50%); 
+    width: 117.2%; 
+    height: 117.2%; 
+    object-fit: contain; 
+    z-index: 5; 
     pointer-events: none;
 }
 
 .turbo-bar-fill {
     position: absolute;
-    top: 52%; left: 51.5%;
+    top: 52%; 
+    left: 51.5%;
     transform: translate(-50%, -50%);
-    width: 117.2%; height: 117.2%;
-    
-    /* 1. DIE MASKE IST WIEDER AKTIV (mit Handy-Sicherung!) */
+    width: 117.2%; 
+    height: 117.2%;
     -webkit-mask-image: url('turbo_BAR.png');
     mask-image: url('turbo_BAR.png');
-    
     -webkit-mask-size: contain;
     mask-size: contain;
-    
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
-    
-    /* 2. Hier kommt unser Tortenstück hin (wird vom JS überschrieben) */
     background: conic-gradient(from 180deg, #fbc072 0deg, transparent 0deg);
-    
     z-index: 6; 
     pointer-events: none !important;
 }
 
 .turbo-needle {
-    position: absolute; height: 222px;width: auto; left: 51%; top: 0%;
+    position: absolute; 
+    height: 222px;
+    width: auto; 
+    left: 51%; 
+    top: 0%;
     transform: translate(50%, 50%) rotate(0deg);
-    transform-origin: 50%  50%; z-index: 10;}
+    transform-origin: 50% 50%; 
+    z-index: 10;
+    pointer-events: none;
+}
 
 .redline {
-    position: absolute; width: 100%; height: 102%; top: -4px; left: -6px; z-index: 3;pointer-events: none;transform-origin: center;
+    position: absolute; 
+    width: 100%; 
+    height: 102%; 
+    top: -4px; 
+    left: -6px; 
+    z-index: 3;
+    pointer-events: none;
+    transform-origin: center;
     filter: invert(24%) sepia(99%) saturate(7469%) hue-rotate(355deg) brightness(101%) contrast(114%);
-    
-    /* HIER PASST DU ES AN: */
-    /* Du musst mit der 'rotate'-Zahl spielen, bis das Segment 
-       genau über dem roten Bereich auf deinem Tacho liegt. */
     transform: rotate(3deg) scale(1.12); 
-    
-    /* Falls die Grafik etwas zu groß oder zu klein ist: */
     object-fit: contain;
 }
 
-
 #fs-trigger {
-    position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
-    padding: 5px 15px; background: rgba(255,255,255,0.1); color: white;
-    border: 1px solid #fff; border-radius: 5px; font-size: 10px; z-index: 1000;
+    position: fixed; 
+    top: 10px; 
+    left: 50%; 
+    transform: translateX(-50%);
+    padding: 5px 15px; 
+    background: rgba(255,255,255,0.1); 
+    color: white;
+    border: 1px solid #fff; 
+    border-radius: 5px; 
+    font-size: 10px; 
+    z-index: 1000;
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NFS MW - Mobile Pro V4</title>
+    <title>NFS MW - Mobile Pro Final</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -11,44 +11,47 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dseg@0.46.0/css/dseg.css">
 </head>
 <body>
 
     <button id="fs-trigger">FULLSCREEN</button>
 
-   <div class="controls-left">
+    <!-- Linke Seite: NOS-Button -->
+    <div class="controls-left">
         <div id="nos-btn">NOS</div>
-        <div class="controls-row">
-            <div id="gear-down" class="btn-gear">−</div>
-            <div id="gear-up" class="btn-gear">+</div>
-        </div>
     </div>
 
+    <!-- Rechte Seite: Das Tacho-Cockpit (Durchsichtig für Touch!) -->
     <div class="hud-right">
         <div class="tacho-box">
             <img src="tacho_bg.png" class="tacho-bg">
             <img src="begrenzer.png" class="redline">
             <img src="TACH_FILL_00.png" class="tacho-fill" id="tacho-fill">
+
+            <img src="gear_and_tempo.png" class="tacho-boxes" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; z-index: 3; pointer-events: none;">
             
             <img src="turbo_BAR.png" class="turbo-bar" id="turbo-bar">
             <div class="turbo-bar-fill" id="turbo-bar-fill"></div>
             <img src="needle.png" id="needle" class="nadel">
             <img src="turbo_needle.png" id="turbo-needle" class="turbo-needle">
         
-        <div class="speedo-digital">
-            <span id="gear-val">1</span>
-            <span id="speed-val">000</span>
-        </div>
-
-        <span id="speed-unit">MPH</span>
-
-        <div class="turbo-unit">
-            <img src="turb_bg.png" class="turbo-bg-img">
+            <!-- Digitale Anzeige mit Glas-Fade -->
+            <div class="speedo-digital">
+                <span id="gear-val">
+                    <span class="gear-bg">8</span>
+                    <span id="gear-num">1</span>
+                </span>
+                <span id="speed-val">888</span>
+            </div>
             
+
+            <span id="speed-unit">MPH</span>
+
+            <div class="turbo-unit">
+                <img src="turb_bg.png" class="turbo-bg-img">
+            </div>
         </div>
     </div>
-</div>
 
     <script src="script.js"></script>
 </body>
